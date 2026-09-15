@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tournament Standings Dashboard</title>
+    <title>Tournament Standings & Bracket</title>
     <style>
         :root {
             --bg-color: #0f172a;
@@ -56,6 +56,7 @@
             padding: 24px;
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
             border: 1px solid var(--border-color);
+            margin-bottom: 30px;
         }
         h2 {
             color: var(--text-main);
@@ -102,13 +103,69 @@
         .neutral-diff {
             color: var(--text-muted);
         }
+
+        /* Bracket styling */
+        .bracket-wrapper {
+            overflow-x: auto;
+            padding: 20px 0;
+        }
+        .bracket {
+            display: flex;
+            gap: 40px;
+            min-width: 600px;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .round {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            gap: 40px;
+            flex: 1;
+        }
+        .round-title {
+            color: var(--accent-color);
+            font-size: 0.9rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        .matchup {
+            display: flex;
+            flex-direction: column;
+            background-color: #111827;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.2);
+        }
+        .bracket-team {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 14px;
+            font-size: 0.9rem;
+            border-bottom: 1px solid rgba(51, 65, 85, 0.5);
+            color: var(--text-muted);
+        }
+        .bracket-team:last-child {
+            border-bottom: none;
+        }
+        .score {
+            font-weight: bold;
+            color: var(--accent-color);
+            background-color: rgba(56, 189, 248, 0.1);
+            padding: 0 8px;
+            border-radius: 4px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
             <h1>Tournament Dashboard</h1>
-            <p class="subtitle">Live Stage Standings & Team Stats</p>
+            <p class="subtitle">Live Stage Standings & Playoff Brackets</p>
         </header>
 
         <div class="grid">
@@ -203,18 +260,40 @@
             </div>
         </div>
 
-        <!-- Team Overview Card -->
+        <!-- Knockout Tournament Bracket Card -->
         <div class="card">
-            <h2>Participating Teams</h2>
-            <div style="display: flex; flex-wrap: wrap; gap: 15px;">
-                <span style="background: var(--border-color); padding: 8px 16px; border-radius: 20px; font-size: 0.9rem;">🛡️ Mark</span>
-                <span style="background: var(--border-color); padding: 8px 16px; border-radius: 20px; font-size: 0.9rem;">🛡️ MelleVerse</span>
-                <span style="background: var(--border-color); padding: 8px 16px; border-radius: 20px; font-size: 0.9rem;">🛡️ Glenn Lanterns</span>
-                <span style="background: var(--border-color); padding: 8px 16px; border-radius: 20px; font-size: 0.9rem;">🛡️ ECR</span>
-                <span style="background: var(--border-color); padding: 8px 16px; border-radius: 20px; font-size: 0.9rem;">🛡️ Ticketing</span>
-                <span style="background: var(--border-color); padding: 8px 16px; border-radius: 20px; font-size: 0.9rem;">🛡️ Tanakris</span>
-            </div>
-        </div>
-    </div>
-</body>
-</html>
+            <h2>Tournament Bracket</h2>
+            <div class="bracket-wrapper">
+                <div class="bracket">
+                    
+                    <!-- Round 1: Semifinals -->
+                    <div class="round">
+                        <div class="round-title">Semifinals</div>
+                        
+                        <div class="matchup">
+                            <div class="bracket-team">
+                                <span>TBD</span>
+                                <span class="score">0</span>
+                            </div>
+                            <div class="bracket-team">
+                                <span>TBD</span>
+                                <span class="score">0</span>
+                            </div>
+                        </div>
+
+                        <div class="matchup">
+                            <div class="bracket-team">
+                                <span>TBD</span>
+                                <span class="score">0</span>
+                            </div>
+                            <div class="bracket-team">
+                                <span>TBD</span>
+                                <span class="score">0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Round 2: Finals -->
+                    <div class="round">
+                        <div class="round-title">Grand Finals</div>
+                        
