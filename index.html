@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tournament Leaderboard & Bracket</title>
+    <title>Dynamic Tournament Hub</title>
     <style>
         /* --- GLOBAL DARK THEME STYLES --- */
         body {
@@ -26,16 +26,107 @@
             margin: 0 auto;
             display: grid;
             grid-template-columns: 1fr;
-            gap: 50px;
+            gap: 40px;
         }
 
-        /* --- 📊 LEADERBOARD SECTION --- */
-        .leaderboard-section {
+        /* --- 🎛️ ADMIN CONTROL PANEL --- */
+        .admin-panel {
+            background: linear-gradient(135deg, #1c2436 0%, #151a26 100%);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+            border: 1px solid #3b4b66;
+        }
+
+        .admin-panel h3 {
+            margin-top: 0;
+            color: #00ffcc;
+            text-transform: uppercase;
+            font-size: 16px;
+            letter-spacing: 1px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 15px;
+            align-items: flex-end;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .form-group label {
+            font-size: 12px;
+            color: #a0aec0;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        .form-group select, .form-group input {
+            background-color: #0b0e14;
+            border: 1px solid #313f5c;
+            color: #fff;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .form-group select:focus, .form-group input:focus {
+            border-color: #00ffcc;
+        }
+
+        .submit-btn {
+            background-color: #00ffcc;
+            color: #0b0e14;
+            border: none;
+            padding: 11px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: all 0.2s ease;
+        }
+
+        .submit-btn:hover {
+            background-color: #00ccaa;
+            box-shadow: 0 0 12px rgba(0, 255, 204, 0.4);
+        }
+
+        /* --- 📊 GROUP SECTIONS --- */
+        .groups-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .groups-wrapper {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .group-card {
             background: #151a26;
             border-radius: 12px;
             padding: 25px;
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
             border: 1px solid #222b3d;
+        }
+
+        .group-title {
+            color: #ffb700;
+            font-size: 18px;
+            margin-top: 0;
+            border-bottom: 2px solid #222b3d;
+            padding-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         table {
@@ -48,33 +139,29 @@
         th {
             background-color: #1e2638;
             color: #a0aec0;
-            padding: 14px;
-            font-size: 14px;
+            padding: 12px;
+            font-size: 13px;
             text-transform: uppercase;
         }
 
         td {
-            padding: 16px;
+            padding: 14px;
             border-bottom: 1px solid #222b3d;
-            font-size: 16px;
+            font-size: 15px;
         }
 
-        tr:hover {
-            background-color: #1c2333;
-        }
-
-        /* --- 🎨 EXCEL CONDITIONAL FORMATTING IN CSS --- */
-        .pos-diff {
-            color: #00ff88; /* Green for positive */
+        /* --- 🎨 CONDITIONAL FORMATTING BADGES --- */
+        .diff-badge {
             font-weight: bold;
+            padding: 2px 6px;
+            border-radius: 4px;
+            display: inline-block;
         }
+        .pos-diff { background: rgba(0, 255, 136, 0.15); color: #00ff88; }
+        .neg-diff { background: rgba(255, 51, 102, 0.15); color: #ff3366; }
+        .neutral-diff { background: rgba(160, 174, 192, 0.15); color: #a0aec0; }
 
-        .neg-diff {
-            color: #ff3366; /* Red for negative */
-            font-weight: bold;
-        }
-
-        /* --- 🏆 4-TEAM BRACKET SECTION --- */
+        /* --- 🏆 TBD BRACKET SECTION --- */
         .bracket-section {
             background: #151a26;
             border-radius: 12px;
@@ -89,7 +176,7 @@
             justify-content: center;
             gap: 40px;
             margin-top: 30px;
-            min-height: 300px;
+            min-height: 260px;
         }
 
         .round {
@@ -97,14 +184,10 @@
             flex-direction: column;
             justify-content: space-around;
             height: 100%;
-            gap: 60px;
+            gap: 50px;
         }
 
-        /* Championship round spaces differently */
-        .round-finals {
-            justify-content: center;
-            gap: 0;
-        }
+        .round-finals { justify-content: center; gap: 0; }
 
         .matchup {
             display: flex;
@@ -125,73 +208,20 @@
             border-bottom: 1px solid #2a364f;
         }
 
-        .team-row:last-child {
-            border-bottom: none;
-        }
+        .team-row:last-child { border-bottom: none; }
+        .team-name { font-weight: 500; color: #a0aec0; }
+        .score { background: #2a364f; padding: 0 8px; border-radius: 4px; font-size: 12px; font-weight: bold; color: #718096; }
 
-        .team-name {
-            font-weight: 500;
-        }
-
-        /* Highlight winner based on Excel 1 vs 0 logic */
-        .winner {
-            color: #00ffcc;
-            font-weight: bold;
-        }
-
-        .score {
-            background: #2a364f;
-            padding: 0 8px;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: bold;
-        }
-
-        /* --- 📐 CSS BRACKET CONNECTOR LINES --- */
-        /* Semi-finals connector branch */
+        /* --- 📐 CSS CONNECTOR LINES --- */
         .matchup-semi::after {
-            content: "";
-            position: absolute;
-            right: -40px;
-            width: 40px;
-            border-right: 2px solid #4a5d82;
-            height: 50%;
+            content: ""; position: absolute; right: -40px; width: 40px; border-right: 2px solid #4a5d82; height: 50%;
         }
+        .match-1::after { top: 50%; border-top: 2px solid #4a5d82; border-top-right-radius: 6px; }
+        .match-2::after { bottom: 50%; border-bottom: 2px solid #4a5d82; border-bottom-right-radius: 6px; }
 
-        /* Top match curves down, bottom match curves up */
-        .match-1::after {
-            top: 50%;
-            border-top: 2px solid #4a5d82;
-            border-top-right-radius: 6px;
-        }
-
-        .match-2::after {
-            bottom: 50%;
-            border-bottom: 2px solid #4a5d82;
-            border-bottom-right-radius: 6px;
-        }
-
-        /* Champion Display Box */
-        .champion-box {
-            background: linear-gradient(135deg, #00ffcc 0%, #0077ff 100%);
-            color: #0b0e14;
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-            box-shadow: 0 0 20px rgba(0, 255, 204, 0.4);
-        }
-
-        .champion-box h3 {
-            margin: 0 0 5px 0;
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .champion-box .name {
-            font-size: 20px;
-            font-weight: 800;
-        }
+        .champion-box { background: #1e2638; color: #ffffff; padding: 20px; border-radius: 10px; text-align: center; border: 2px dashed #4a5d82; min-width: 140px; }
+        .champion-box h3 { margin: 0 0 5px 0; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #a0aec0; }
+        .champion-box .name { font-size: 18px; font-weight: bold; color: #718096; }
     </style>
 </head>
 <body>
@@ -200,124 +230,79 @@
 
     <div class="container">
         
-        <!-- 1. LEADERBOARD CARD -->
-        <div class="leaderboard-section">
-            <h2>🏆 Leaderboard Standings</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Rank</th>
-                        <th>Team Name</th>
-                        <th>Wins</th>
-                        <th>Losses</th>
-                        <th>Kills</th>
-                        <th>Deaths</th>
-                        <th>Kill Diff</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Row 1: Top Ranked Seed -->
-                    <tr>
-                        <td>1st</td>
-                        <td><strong>Team Alpha</strong></td>
-                        <td>3</td>
-                        <td>0</td>
-                        <td>45</td>
-                        <td>20</td>
-                        <td class="pos-diff">+25</td> <!-- Green via CSS class -->
-                    </tr>
-                    <!-- Row 2 -->
-                    <tr>
-                        <td>2nd</td>
-                        <td><strong>Team Delta</strong></td>
-                        <td>2</td>
-                        <td>1</td>
-                        <td>38</td>
-                        <td>30</td>
-                        <td class="pos-diff">+8</td>
-                    </tr>
-                    <!-- Row 3 -->
-                    <tr>
-                        <td>3rd</td>
-                        <td><strong>Team Bravo</strong></td>
-                        <td>1</td>
-                        <td>2</td>
-                        <td>28</td>
-                        <td>32</td>
-                        <td class="neg-diff">-4</td> <!-- Red via CSS class -->
-                    </tr>
-                    <!-- Row 4 -->
-                    <tr>
-                        <td>4th</td>
-                        <td><strong>Team Charlie</strong></td>
-                        <td>0</td>
-                        <td>3</td>
-                        <td>15</td>
-                        <td>44</td>
-                        <td class="neg-diff">-29</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <!-- 2. 4-TEAM BRACKET CARD -->
-        <div class="bracket-section">
-            <h2>🌿 Playoff Bracket</h2>
-            <div class="bracket-wrapper">
-                
-                <!-- ROUND 1: SEMIFINALS -->
-                <div class="round">
-                    <!-- Match 1: Seed 1 vs Seed 4 -->
-                    <div class="matchup matchup-semi match-1">
-                        <div class="team-row winner">
-                            <span class="team-name">Team Alpha</span>
-                            <span class="score">1 (W)</span>
-                        </div>
-                        <div class="team-row">
-                            <span class="team-name">Team Charlie</span>
-                            <span class="score">0 (L)</span>
-                        </div>
-                    </div>
-
-                    <!-- Match 2: Seed 2 vs Seed 3 -->
-                    <div class="matchup matchup-semi match-2">
-                        <div class="team-row winner">
-                            <span class="team-name">Team Delta</span>
-                            <span class="score">1 (W)</span>
-                        </div>
-                        <div class="team-row">
-                            <span class="team-name">Team Bravo</span>
-                            <span class="score">0 (L)</span>
-                        </div>
-                    </div>
+        <!-- 🎛️ ADMIN CONTROL INTERFACE -->
+        <div class="admin-panel">
+            <h3>⚙️ Admin Score Keeper</h3>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="teamSelect">Select Team</label>
+                    <select id="teamSelect">
+                        <optgroup label="Group A">
+                            <option value="Mark">Mark</option>
+                            <option value="MelleVerse">MelleVerse</option>
+                            <option value="Glenn Lanterns">Glenn Lanterns</option>
+                        </optgroup>
+                        <optgroup label="Group B">
+                            <option value="ECR">ECR</option>
+                            <option value="Ticketing">Ticketing</option>
+                            <option value="Tanakris">Tanakris</option>
+                        </optgroup>
+                    </select>
                 </div>
-
-                <!-- ROUND 2: FINALS -->
-                <div class="round round-finals">
-                    <div class="matchup">
-                        <div class="team-row winner">
-                            <span class="team-name">Team Alpha</span>
-                            <span class="score">1</span>
-                        </div>
-                        <div class="team-row">
-                            <span class="team-name">Team Delta</span>
-                            <span class="score">0</span>
-                        </div>
-                    </div>
+                <div class="form-group">
+                    <label for="winsInput">Wins</label>
+                    <input type="number" id="winsInput" min="0" value="0">
                 </div>
-
-                <!-- CHAMPION CROWN -->
-                <div class="round">
-                    <div class="champion-box">
-                        <h3>Grand Champion</h3>
-                        <div class="name">🏆 Team Alpha</div>
-                    </div>
+                <div class="form-group">
+                    <label for="lossesInput">Losses</label>
+                    <input type="number" id="lossesInput" min="0" value="0">
                 </div>
-
+                <div class="form-group">
+                    <label for="killsInput">Kills</label>
+                    <input type="number" id="killsInput" min="0" value="0">
+                </div>
+                <div class="form-group">
+                    <label for="deathsInput">Deaths</label>
+                    <input type="number" id="deathsInput" min="0" value="0">
+                </div>
+                <button class="submit-btn" onclick="updateTeamStats()">Save Stats</button>
             </div>
         </div>
+        
+        <!-- GROUP STAGE TABLES -->
+        <div class="groups-wrapper">
+            <!-- GROUP A -->
+            <div class="group-card">
+                <h3 class="group-title">🏆 Group A Standings</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Team Name</th>
+                            <th>W</th>
+                            <th>L</th>
+                            <th>K</th>
+                            <th>D</th>
+                            <th>Diff</th>
+                        </tr>
+                    </thead>
+                    <tbody id="groupA-table">
+                        <!-- Sorted data will load here dynamically via JavaScript -->
+                    </tbody>
+                </table>
+            </div>
 
-    </div>
-
-</body>
-</html>
+            <!-- GROUP B -->
+            <div class="group-card">
+                <h3 class="group-title">🏆 Group B Standings</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Team Name</th>
+                            <th>W</th>
+                            <th>L</th>
+                            <th>K</th>
+                            <th>D</th>
+                            <th>Diff</th>
+                        </tr>
+                    </thead>
+                    <tbody id="groupB-table">
