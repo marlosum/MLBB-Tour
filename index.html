@@ -3,331 +3,218 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tournament Groups & Bracket</title>
+    <title>Tournament Standings Dashboard</title>
     <style>
-        /* --- GLOBAL DARK THEME STYLES --- */
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --accent-color: #38bdf8;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: #334155;
+            --success: #4ade80;
+            --danger: #f87171;
+        }
         body {
-            background-color: #0b0e14;
-            color: #ffffff;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
-            padding: 40px;
+            padding: 40px 20px;
+            background-color: var(--bg-color);
+            color: var(--text-main);
         }
-
-        h1, h2 {
-            text-align: center;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            color: #00ffcc;
-        }
-
         .container {
             max-width: 1200px;
-            margin: 0 auto;
+            margin: auto;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        h1 {
+            color: var(--accent-color);
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+        .grid {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 40px;
-        }
-
-        /* --- 📊 GROUP SECTIONS --- */
-        .groups-wrapper {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
             gap: 30px;
+            margin-bottom: 40px;
         }
-
-        @media (max-width: 768px) {
-            .groups-wrapper {
-                grid-template-columns: 1fr;
+        @media(min-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr 1fr;
             }
         }
-
-        .group-card {
-            background: #151a26;
+        .card {
+            background-color: var(--card-bg);
             border-radius: 12px;
-            padding: 25px;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
-            border: 1px solid #222b3d;
+            padding: 24px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-color);
         }
-
-        .group-title {
-            color: #ffb700;
-            font-size: 20px;
+        h2 {
+            color: var(--text-main);
             margin-top: 0;
-            border-bottom: 2px solid #222b3d;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            border-bottom: 2px solid var(--border-color);
             padding-bottom: 10px;
         }
-
+        .table-container {
+            overflow-x: auto;
+        }
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 15px;
             text-align: left;
         }
-
+        th, td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
         th {
-            background-color: #1e2638;
-            color: #a0aec0;
-            padding: 12px;
-            font-size: 13px;
+            color: var(--accent-color);
+            font-weight: 600;
             text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.05em;
         }
-
         td {
-            padding: 14px;
-            border-bottom: 1px solid #222b3d;
-            font-size: 15px;
+            font-size: 0.95rem;
         }
-
         tr:hover {
-            background-color: #1c2333;
+            background-color: rgba(56, 189, 248, 0.05);
         }
-
-        /* --- 🎨 EXCEL CONDITIONAL FORMATTING IN CSS --- */
-        .pos-diff {
-            color: #00ff88; /* Green for positive */
-            font-weight: bold;
-        }
-
-        .neg-diff {
-            color: #ff3366; /* Red for negative */
-            font-weight: bold;
-        }
-
-        .neutral-diff {
-            color: #a0aec0; /* Gray for zero */
-        }
-
-        /* --- 🏆 TBD BRACKET SECTION --- */
-        .bracket-section {
-            background: #151a26;
-            border-radius: 12px;
-            padding: 25px;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
-            border: 1px solid #222b3d;
-        }
-
-        .bracket-wrapper {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 40px;
-            margin-top: 30px;
-            min-height: 260px;
-        }
-
-        .round {
-            display: flex;
-            flex-direction: column;
-            justify-content: space-around;
-            height: 100%;
-            gap: 50px;
-        }
-
-        .round-finals {
-            justify-content: center;
-            gap: 0;
-        }
-
-        .matchup {
-            display: flex;
-            flex-direction: column;
-            background: #1e2638;
-            border-radius: 6px;
-            width: 200px;
-            border: 1px solid #313f5c;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .team-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 10px 14px;
-            font-size: 14px;
-            border-bottom: 1px solid #2a364f;
-        }
-
-        .team-row:last-child {
-            border-bottom: none;
-        }
-
         .team-name {
-            font-weight: 500;
-            color: #a0aec0; /* Dimmed name for TBD status */
-        }
-
-        .score {
-            background: #2a364f;
-            padding: 0 8px;
-            border-radius: 4px;
-            font-size: 12px;
             font-weight: bold;
-            color: #718096;
         }
-
-        /* --- 📐 CSS BRACKET CONNECTOR LINES --- */
-        .matchup-semi::after {
-            content: "";
-            position: absolute;
-            right: -40px;
-            width: 40px;
-            border-right: 2px solid #4a5d82;
-            height: 50%;
+        .pos-diff {
+            color: var(--success);
         }
-
-        .match-1::after {
-            top: 50%;
-            border-top: 2px solid #4a5d82;
-            border-top-right-radius: 6px;
+        .neg-diff {
+            color: var(--danger);
         }
-
-        .match-2::after {
-            bottom: 50%;
-            border-bottom: 2px solid #4a5d82;
-            border-bottom-right-radius: 6px;
-        }
-
-        /* Champion Display Box */
-        .champion-box {
-            background: #1e2638;
-            color: #ffffff;
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-            border: 2px dashed #4a5d82;
-            min-width: 140px;
-        }
-
-        .champion-box h3 {
-            margin: 0 0 5px 0;
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: #a0aec0;
-        }
-
-        .champion-box .name {
-            font-size: 18px;
-            font-weight: bold;
-            color: #718096;
+        .neutral-diff {
+            color: var(--text-muted);
         }
     </style>
 </head>
 <body>
-
-    <h1>AMAZON CEB10 D2 MLBB TOURNAMENT</h1>
-
     <div class="container">
-        
-        <!-- GROUP STAGE TABLES -->
-        <div class="groups-wrapper">
-            
-            <!-- GROUP A -->
-            <div class="group-card">
-                <h3 class="group-title"> Group A Standings</h3>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Team Name</th>
-                            <th>W</th>
-                            <th>L</th>
-                            <th>K</th>
-                            <th>D</th>
-                            <th>Diff</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><strong>Mark</strong></td>
-                            <td>0</td><td>0</td><td>0</td><td>0</td>
-                            <td class="neutral-diff">0</td>
-                        </tr>
-                        <tr>
-                            <td><strong>MelleVerse</strong></td>
-                            <td>0</td><td>0</td><td>0</td><td>0</td>
-                            <td class="neutral-diff">0</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Glenn Lanterns</strong></td>
-                            <td>0</td><td>0</td><td>0</td><td>0</td>
-                            <td class="neutral-diff">0</td>
-                        </tr>
-                    </tbody>
-                </table>
+        <header>
+            <h1>Tournament Dashboard</h1>
+            <p class="subtitle">Live Stage Standings & Team Stats</p>
+        </header>
+
+        <div class="grid">
+            <!-- Group A Card -->
+            <div class="card">
+                <h2>Group A Standings</h2>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Teams</th>
+                                <th>Wins</th>
+                                <th>Loss</th>
+                                <th>Kills</th>
+                                <th>Deaths</th>
+                                <th>Kill Diff</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="team-name">MelleVerse</td>
+                                <td>1</td>
+                                <td>0</td>
+                                <td>25</td>
+                                <td>33</td>
+                                <td class="neg-diff">-8</td>
+                            </tr>
+                            <tr>
+                                <td class="team-name">Mark</td>
+                                <td>0</td>
+                                <td>0</td>
+                                <td>0</td>
+                                <td>0</td>
+                                <td class="neutral-diff">0</td>
+                            </tr>
+                            <tr>
+                                <td class="team-name">Glenn Lanterns</td>
+                                <td>0</td>
+                                <td>1</td>
+                                <td>33</td>
+                                <td>25</td>
+                                <td class="pos-diff">+8</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
-            <!-- GROUP B -->
-            <div class="group-card">
-                <h3 class="group-title"> Group B Standings</h3>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Team Name</th>
-                            <th>W</th>
-                            <th>L</th>
-                            <th>K</th>
-                            <th>D</th>
-                            <th>Diff</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- Ticketing is ranked 1st right now because of 1 win -->
-                        <tr>
-                            <td><strong>Ticketing</strong></td>
-                            <td>1</td><td>0</td><td>20</td><td>21</td>
-                            <td class="neg-diff">-1</td> <!-- 20 - 21 = -1 (Red) -->
-                        </tr>
-                        <tr>
-                            <td><strong>ECR</strong></td>
-                            <td>0</td><td>1</td><td>21</td><td>20</td>
-                            <td class="pos-diff">+1</td> <!-- 21 - 20 = +1 (Green) -->
-                        </tr>
-                        <tr>
-                            <td><strong>Tanakris</strong></td>
-                            <td>0</td><td>0</td><td>0</td><td>0</td>
-                            <td class="neutral-diff">0</td>
-                        </tr>
-                    </tbody>
-                </table>
+            <!-- Group B Card -->
+            <div class="card">
+                <h2>Group B Standings</h2>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Teams</th>
+                                <th>Wins</th>
+                                <th>Loss</th>
+                                <th>Kills</th>
+                                <th>Deaths</th>
+                                <th>Kill Diff</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="team-name">Ticketing</td>
+                                <td>1</td>
+                                <td>0</td>
+                                <td>20</td>
+                                <td>21</td>
+                                <td class="neg-diff">-1</td>
+                            </tr>
+                            <tr>
+                                <td class="team-name">ECR</td>
+                                <td>0</td>
+                                <td>1</td>
+                                <td>21</td>
+                                <td>20</td>
+                                <td class="pos-diff">+1</td>
+                            </tr>
+                            <tr>
+                                <td class="team-name">Tanakris</td>
+                                <td>0</td>
+                                <td>0</td>
+                                <td>0</td>
+                                <td>0</td>
+                                <td class="neutral-diff">0</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
-
         </div>
 
-        <!-- 4-TEAM PLAYOFF BRACKET (RESET TO TBD) -->
-        <div class="bracket-section">
-            <h2>Playoff Bracket</h2>
-            <div class="bracket-wrapper">
-                
-                <!-- ROUND 1: SEMIFINALS -->
-                <div class="round">
-                    <!-- Match 1 -->
-                    <div class="matchup matchup-semi match-1">
-                        <div class="team-row">
-                            <span class="team-name">TBD</span>
-                            <span class="score">-</span>
-                        </div>
-                        <div class="team-row">
-                            <span class="team-name">TBD</span>
-                            <span class="score">-</span>
-                        </div>
-                    </div>
-
-                    <!-- Match 2 -->
-                    <div class="matchup matchup-semi match-2">
-                        <div class="team-row">
-                            <span class="team-name">TBD</span>
-                            <span class="score">-</span>
-                        </div>
-                        <div class="team-row">
-                            <span class="team-name">TBD</span>
-                            <span class="score">-</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ROUND 2: FINALS -->
-                <div class="round round-finals">
-                    <div class="matchup">
-                        <div class="team-row">
-                            <span class="team-name">TBD</span>
+        <!-- Team Overview Card -->
+        <div class="card">
+            <h2>Participating Teams</h2>
+            <div style="display: flex; flex-wrap: wrap; gap: 15px;">
+                <span style="background: var(--border-color); padding: 8px 16px; border-radius: 20px; font-size: 0.9rem;">🛡️ Mark</span>
+                <span style="background: var(--border-color); padding: 8px 16px; border-radius: 20px; font-size: 0.9rem;">🛡️ MelleVerse</span>
+                <span style="background: var(--border-color); padding: 8px 16px; border-radius: 20px; font-size: 0.9rem;">🛡️ Glenn Lanterns</span>
+                <span style="background: var(--border-color); padding: 8px 16px; border-radius: 20px; font-size: 0.9rem;">🛡️ ECR</span>
+                <span style="background: var(--border-color); padding: 8px 16px; border-radius: 20px; font-size: 0.9rem;">🛡️ Ticketing</span>
+                <span style="background: var(--border-color); padding: 8px 16px; border-radius: 20px; font-size: 0.9rem;">🛡️ Tanakris</span>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
