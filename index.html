@@ -1,303 +1,535 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tournament Standings & Playoff Bracket</title>
-    <style>
-        :root {
-            --bg-color: #0f172a;
-            --card-bg: #1e293b;
-            --accent-color: #38bdf8;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --border-color: #334155;
-            --success: #4ade80;
-            --danger: #f87171;
-            --connector-color: #475569;
-        }
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 40px 20px;
-            background-color: var(--bg-color);
-            color: var(--text-main);
-        }
-        .container {
-            max-width: 1200px;
-            margin: auto;
-        }
-        header {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-        h1 {
-            color: var(--accent-color);
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-        }
-        .subtitle {
-            color: var(--text-muted);
-            font-size: 1.1rem;
-        }
-        .grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 30px;
-            margin-bottom: 40px;
-        }
-        @media(min-width: 768px) {
-            .grid {
-                grid-template-columns: 1fr 1fr;
-            }
-        }
-        .card {
-            background-color: var(--card-bg);
-            border-radius: 12px;
-            padding: 24px;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
-            border: 1px solid var(--border-color);
-            margin-bottom: 30px;
-        }
-        h2 {
-            color: var(--text-main);
-            margin-top: 0;
-            margin-bottom: 20px;
-            font-size: 1.5rem;
-            border-bottom: 2px solid var(--border-color);
-            padding-bottom: 10px;
-        }
-        .table-container {
-            overflow-x: auto;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: left;
-        }
-        th, td {
-            padding: 12px 16px;
-            border-bottom: 1px solid var(--border-color);
-        }
-        th {
-            color: var(--accent-color);
-            font-weight: 600;
-            text-transform: uppercase;
-            font-size: 0.85rem;
-            letter-spacing: 0.05em;
-        }
-        td {
-            font-size: 0.95rem;
-        }
-        .team-name {
-            font-weight: bold;
-        }
-        .pos-diff { color: var(--success); }
-        .neg-diff { color: var(--danger); }
-        .neutral-diff { color: var(--text-muted); }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Amazon D2 MLBB Tournament</title>
+<style>
+    :root {
+        --bg: #0b1120;
+        --card: #111827;
+        --card2: #0f172a;
+        --border: #263449;
+        --accent: #38bdf8;
+        --gold: #fbbf24;
+        --text: #f8fafc;
+        --muted: #94a3b8;
+        --green: #4ade80;
+        --red: #f87171;
+    }
 
-        /* Tournament Bracket Layout */
-        .bracket-wrapper {
-            overflow-x: auto;
-            padding: 30px 10px;
-        }
-        .bracket-container {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            min-width: 800px;
-            gap: 20px;
-        }
-        .bracket-column {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            width: 240px;
-            position: relative;
-        }
-        .bracket-column.semis {
-            gap: 90px;
-        }
-        .bracket-column.finals {
-            gap: 0;
-        }
-        .column-header {
-            color: var(--accent-color);
-            font-size: 0.85rem;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 0.15em;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .matchup-block {
-            display: flex;
-            flex-direction: column;
-            background-color: #0f172a;
-            border: 2px solid var(--border-color);
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
-        }
-        .matchup-block.active-glow {
-            border-color: rgba(56, 189, 248, 0.4);
-        }
-        .slot {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 16px;
-            font-size: 0.95rem;
-            color: var(--text-muted);
-            border-bottom: 1px solid rgba(51, 65, 85, 0.4);
-            background-color: #111827;
-        }
-        .slot:last-child {
-            border-bottom: none;
-        }
-        .slot .team-title {
-            font-weight: 600;
-            color: #cbd5e1;
-        }
-        .slot .score-badge {
-            font-weight: bold;
-            color: var(--accent-color);
-            background-color: rgba(56, 189, 248, 0.1);
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 0.85rem;
-        }
-        
-        /* Champion Pod Structure */
-        .champion-pod {
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-        .trophy-banner {
-            background: linear-gradient(135deg, #eab308 0%, #ca8a04 100%);
-            padding: 20px 40px;
-            border-radius: 12px;
-            font-weight: 800;
-            color: #0f172a;
-            font-size: 1.4rem;
-            letter-spacing: 0.05em;
-            box-shadow: 0 0 25px rgba(234, 179, 8, 0.3);
-            border: 2px solid #fef08a;
-            min-width: 180px;
-            text-transform: uppercase;
-        }
-    </style>
+    * { box-sizing: border-box; }
+
+    body {
+        margin: 0;
+        padding: 32px 18px 60px;
+        background:
+            radial-gradient(circle at top, rgba(56,189,248,.10), transparent 35%),
+            var(--bg);
+        color: var(--text);
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .container { max-width: 1250px; margin: auto; }
+
+    header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .eyebrow {
+        color: var(--accent);
+        font-size: .8rem;
+        font-weight: 800;
+        letter-spacing: .18em;
+        text-transform: uppercase;
+    }
+
+    h1 {
+        margin: 8px 0;
+        font-size: clamp(2rem, 5vw, 3.2rem);
+    }
+
+    .subtitle {
+        margin: 0;
+        color: var(--muted);
+    }
+
+    .status {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 16px;
+        padding: 7px 12px;
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        background: rgba(17,24,39,.8);
+        color: var(--muted);
+        font-size: .82rem;
+    }
+
+    .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--green);
+        box-shadow: 0 0 10px var(--green);
+    }
+
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 22px;
+        margin-bottom: 22px;
+    }
+
+    .card {
+        background: rgba(17,24,39,.94);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 22px;
+        box-shadow: 0 12px 30px rgba(0,0,0,.25);
+    }
+
+    .card h2 {
+        margin: 0 0 18px;
+        font-size: 1.35rem;
+    }
+
+    .group-label {
+        color: var(--accent);
+        font-size: .78rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: .12em;
+        margin-bottom: 4px;
+    }
+
+    .table-wrap { overflow-x: auto; }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 510px;
+    }
+
+    th, td {
+        padding: 12px 10px;
+        border-bottom: 1px solid var(--border);
+        text-align: center;
+        white-space: nowrap;
+    }
+
+    th:first-child, td:first-child { text-align: left; }
+
+    th {
+        color: var(--muted);
+        font-size: .72rem;
+        text-transform: uppercase;
+        letter-spacing: .07em;
+    }
+
+    td { font-size: .92rem; }
+
+    tr:last-child td { border-bottom: 0; }
+
+    .rank {
+        width: 28px;
+        display: inline-flex;
+        justify-content: center;
+        color: var(--muted);
+        font-weight: 700;
+    }
+
+    .team { font-weight: 700; }
+
+    .qualified {
+        color: var(--green);
+        font-weight: 800;
+    }
+
+    .diff-positive { color: var(--green); font-weight: 700; }
+    .diff-negative { color: var(--red); font-weight: 700; }
+    .diff-neutral { color: var(--muted); }
+
+    /* Bracket */
+    .bracket-card { padding-bottom: 28px; }
+
+    .bracket-note {
+        color: var(--muted);
+        margin: -8px 0 4px;
+        font-size: .88rem;
+    }
+
+    .bracket-scroll {
+        overflow-x: auto;
+        padding: 28px 8px 12px;
+    }
+
+    .bracket {
+        min-width: 930px;
+        display: grid;
+        grid-template-columns: 270px 270px 270px;
+        column-gap: 70px;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .round {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .round-title {
+        text-align: center;
+        color: var(--accent);
+        font-size: .78rem;
+        font-weight: 900;
+        letter-spacing: .16em;
+        text-transform: uppercase;
+        margin-bottom: 14px;
+    }
+
+    .match {
+        position: relative;
+        background: var(--card2);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        overflow: visible;
+        box-shadow: 0 7px 18px rgba(0,0,0,.25);
+    }
+
+    .match + .match { margin-top: 125px; }
+
+    .match::after {
+        content: "";
+        position: absolute;
+        right: -71px;
+        top: 50%;
+        width: 70px;
+        height: 1px;
+        background: #475569;
+    }
+
+    .semis .match:first-of-type::before,
+    .semis .match:last-of-type::before {
+        content: "";
+        position: absolute;
+        right: -71px;
+        width: 1px;
+        height: 125px;
+        background: #475569;
+    }
+
+    .semis .match:first-of-type::before { top: 50%; }
+    .semis .match:last-of-type::before { bottom: 50%; }
+
+    .finals .match {
+        margin-top: 0;
+    }
+
+    .finals .match::before {
+        content: "";
+        position: absolute;
+        left: -71px;
+        top: 50%;
+        width: 70px;
+        height: 1px;
+        background: #475569;
+    }
+
+    .champion .match::after { display: none; }
+
+    .slot {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        min-height: 48px;
+        padding: 0 13px;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .slot:last-child { border-bottom: 0; }
+
+    .slot-name {
+        font-weight: 700;
+        color: #dbeafe;
+    }
+
+    .slot-sub {
+        display: block;
+        color: var(--muted);
+        font-size: .68rem;
+        margin-top: 2px;
+        font-weight: 500;
+    }
+
+    .score {
+        min-width: 25px;
+        text-align: center;
+        color: var(--muted);
+        font-weight: 800;
+    }
+
+    .placeholder {
+        color: #64748b;
+        font-style: italic;
+    }
+
+    .champion {
+        text-align: center;
+        align-items: center;
+    }
+
+    .champion .round-title { color: var(--gold); }
+
+    .trophy {
+        font-size: 3.3rem;
+        margin-bottom: 8px;
+        filter: drop-shadow(0 0 14px rgba(251,191,36,.25));
+    }
+
+    .champion-box {
+        width: 100%;
+        padding: 22px 14px;
+        border: 2px solid rgba(251,191,36,.65);
+        border-radius: 12px;
+        background: linear-gradient(135deg, rgba(251,191,36,.13), rgba(17,24,39,.95));
+    }
+
+    .champion-label {
+        color: var(--gold);
+        font-size: .7rem;
+        font-weight: 900;
+        letter-spacing: .15em;
+        text-transform: uppercase;
+    }
+
+    .champion-name {
+        margin-top: 7px;
+        font-size: 1.2rem;
+        font-weight: 900;
+    }
+
+    .legend {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 18px;
+        margin-top: 16px;
+        color: var(--muted);
+        font-size: .78rem;
+    }
+
+    .legend span::before {
+        content: "";
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        margin-right: 6px;
+        background: var(--accent);
+    }
+
+    footer {
+        text-align: center;
+        color: #64748b;
+        font-size: .75rem;
+        margin-top: 24px;
+    }
+
+    @media (max-width: 800px) {
+        body { padding: 24px 12px 45px; }
+        .grid { grid-template-columns: 1fr; }
+        .card { padding: 17px; }
+    }
+</style>
 </head>
+
 <body>
-    <div class="container">
-        <header>
-            <h1>Tournament Dashboard</h1>
-            <p class="subtitle">Live Stage Standings & Playoff Brackets</p>
-        </header>
+<div class="container">
 
-        <div class="grid">
-            <!-- Group A Card -->
-            <div class="card">
-                <h2>Group A Standings</h2>
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Teams</th>
-                                <th>Wins</th>
-                                <th>Loss</th>
-                                <th>Kills</th>
-                                <th>Deaths</th>
-                                <th>Kill Diff</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td class="team-name">MelleVerse</td>
-                                <td>1</td>
-                                <td>0</td>
-                                <td>25</td>
-                                <td>33</td>
-                                <td class="neg-diff">-8</td>
-                            </tr>
-                            <tr>
-                                <td class="team-name">Mark</td>
-                                <td>0</td>
-                                <td>0</td>
-                                <td>0</td>
-                                <td>0</td>
-                                <td class="neutral-diff">0</td>
-                            </tr>
-                            <tr>
-                                <td class="team-name">Glenn Lanterns</td>
-                                <td>0</td>
-                                <td>1</td>
-                                <td>33</td>
-                                <td>25</td>
-                                <td class="pos-diff">+8</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+    <header>
+        <div class="eyebrow">Amazon D2 MLBB Tournament</div>
+        <h1>Tournament Dashboard</h1>
+        <p class="subtitle">Group Stage Standings & Championship Playoffs</p>
+        <div class="status"><span class="dot"></span> Round 1 Results Updated</div>
+    </header>
 
-            <!-- Group B Card -->
-            <div class="card">
-                <h2>Group B Standings</h2>
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Teams</th>
-                                <th>Wins</th>
-                                <th>Loss</th>
-                                <th>Kills</th>
-                                <th>Deaths</th>
-                                <th>Kill Diff</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td class="team-name">Ticketing</td>
-                                <td>1</td>
-                                <td>0</td>
-                                <td>20</td>
-                                <td>21</td>
-                                <td class="neg-diff">-1</td>
-                            </tr>
-                            <tr>
-                                <td class="team-name">ECR</td>
-                                <td>0</td>
-                                <td>1</td>
-                                <td>21</td>
-                                <td>20</td>
-                                <td class="pos-diff">+1</td>
-                            </tr>
-                            <tr>
-                                <td class="team-name">Tanakris</td>
-                                <td>0</td>
-                                <td>0</td>
-                                <td>0</td>
-                                <td>0</td>
-                                <td class="neutral-diff">0</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+    <!-- GROUP STANDINGS -->
+    <section class="grid">
+
+        <div class="card">
+            <div class="group-label">Group A</div>
+            <h2>Group A Standings</h2>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Team</th>
+                            <th>W</th>
+                            <th>L</th>
+                            <th>Kills</th>
+                            <th>Deaths</th>
+                            <th>Diff</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="rank">1</span><span class="team">MelleVerse</span></td>
+                            <td>1</td><td>0</td><td>25</td><td>33</td>
+                            <td class="diff-negative">-8</td>
+                        </tr>
+                        <tr>
+                            <td><span class="rank">2</span><span class="team">Mark</span></td>
+                            <td>0</td><td>0</td><td>0</td><td>0</td>
+                            <td class="diff-neutral">0</td>
+                        </tr>
+                        <tr>
+                            <td><span class="rank">3</span><span class="team">Glenn Lanterns</span></td>
+                            <td>0</td><td>1</td><td>33</td><td>25</td>
+                            <td class="diff-positive">+8</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
 
-        <!-- Knockout Tournament Bracket Card -->
         <div class="card">
-            <h2>Championship Playoffs</h2>
-            <div class="bracket-wrapper">
-                <div class="bracket-container">
-                    
-                    <!-- COLUMN 1: SEMIFINALS -->
-                    <div class="bracket-column semis">
-                        <div class="column-header">Semifinals</div>
-                        
-                        <!-- Semifinal Match 1 Block -->
+            <div class="group-label">Group B</div>
+            <h2>Group B Standings</h2>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Team</th>
+                            <th>W</th>
+                            <th>L</th>
+                            <th>Kills</th>
+                            <th>Deaths</th>
+                            <th>Diff</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="rank">1</span><span class="team">Ticketing</span></td>
+                            <td>1</td><td>0</td><td>20</td><td>21</td>
+                            <td class="diff-negative">-1</td>
+                        </tr>
+                        <tr>
+                            <td><span class="rank">2</span><span class="team">ECR</span></td>
+                            <td>0</td><td>1</td><td>21</td><td>20</td>
+                            <td class="diff-positive">+1</td>
+                        </tr>
+                        <tr>
+                            <td><span class="rank">3</span><span class="team">Tanakris</span></td>
+                            <td>0</td><td>0</td><td>0</td><td>0</td>
+                            <td class="diff-neutral">0</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </section>
+
+    <!-- TOURNAMENT BRACKET -->
+    <section class="card bracket-card">
+        <h2>Championship Playoffs</h2>
+        <p class="bracket-note">
+            Top 2 teams from each group advance. Semifinal matchups will be determined after the group stage.
+        </p>
+
+        <div class="bracket-scroll">
+            <div class="bracket">
+
+                <!-- SEMIFINALS -->
+                <div class="round semis">
+                    <div class="round-title">Semifinals</div>
+
+                    <div class="match">
+                        <div class="slot">
+                            <div>
+                                <span class="slot-name placeholder">TBD</span>
+                                <span class="slot-sub">Group A #1</span>
+                            </div>
+                            <span class="score">—</span>
+                        </div>
+                        <div class="slot">
+                            <div>
+                                <span class="slot-name placeholder">TBD</span>
+                                <span class="slot-sub">Group B #2</span>
+                            </div>
+                            <span class="score">—</span>
+                        </div>
+                    </div>
+
+                    <div class="match">
+                        <div class="slot">
+                            <div>
+                                <span class="slot-name placeholder">TBD</span>
+                                <span class="slot-sub">Group B #1</span>
+                            </div>
+                            <span class="score">—</span>
+                        </div>
+                        <div class="slot">
+                            <div>
+                                <span class="slot-name placeholder">TBD</span>
+                                <span class="slot-sub">Group A #2</span>
+                            </div>
+                            <span class="score">—</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- GRAND FINALS -->
+                <div class="round finals">
+                    <div class="round-title">Grand Finals</div>
+
+                    <div class="match">
+                        <div class="slot">
+                            <div>
+                                <span class="slot-name placeholder">Winner — SF1</span>
+                                <span class="slot-sub">TBD</span>
+                            </div>
+                            <span class="score">—</span>
+                        </div>
+                        <div class="slot">
+                            <div>
+                                <span class="slot-name placeholder">Winner — SF2</span>
+                                <span class="slot-sub">TBD</span>
+                            </div>
+                            <span class="score">—</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CHAMPION -->
+                <div class="round champion">
+                    <div class="round-title">Champion</div>
+                    <div class="trophy">🏆</div>
+                    <div class="champion-box">
+                        <div class="champion-label">Tournament Champion</div>
+                        <div class="champion-name">TBD</div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="legend">
+            <span>Semifinal</span>
+            <span>Grand Final</span>
+            <span>Champion</span>
+        </div>
+    </section>
+
+    <footer>
+        Amazon D2 MLBB Tournament • Update team names and scores directly in index.html
+    </footer>
+
+</div>
+</body>
+</html>
